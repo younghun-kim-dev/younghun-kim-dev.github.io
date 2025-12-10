@@ -7,7 +7,7 @@ nav_order: 5
 
 # 상단에 뜨는 PDF 다운로드 버튼에 연결될 파일 경로
 # 실제 파일 이름/경로에 맞게 수정해서 쓰면 돼.
-cv_pdf: /assets/pdf/Kim_Younghun_CV.pdf
+cv_pdf: Kim_Younghun_CV.pdf
 
 # 페이지 상단에 보이는 한 줄 설명
 description: "Curriculum Vitae of Younghun Kim"
