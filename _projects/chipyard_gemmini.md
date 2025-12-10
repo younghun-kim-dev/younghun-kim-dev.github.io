@@ -1,5 +1,5 @@
 ---
-layout: project
+layout: page
 title: "Gemmini Offload Thresholds & Memory-Centric Pipeline Co-Design"
 permalink: /projects/chipyard_gemmini/
 description: >
