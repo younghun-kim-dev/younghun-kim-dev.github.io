@@ -101,8 +101,7 @@ With a **single-bank inclusive L2**, speedup behaves as follows:
 
 So from the system’s point of view, the same RoCC looks like:
 
-- **≈170×** at mid-size messages, but only  
-- **~120×** at application-scale messages.
+- **≈170×** at mid-size messages, but only **~120×** at application-scale messages.
 
 The difference is entirely in the memory path.
 
