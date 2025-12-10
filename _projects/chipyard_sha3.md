@@ -1,5 +1,5 @@
 ---
-layout: project
+layout: page
 title: "SHA3 Accelerator Performance Stabilization in Chipyard"
 permalink: /projects/chipyard_sha3/
 description: >
