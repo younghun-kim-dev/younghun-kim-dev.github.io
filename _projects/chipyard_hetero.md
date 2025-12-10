@@ -35,6 +35,7 @@ links:
   custom co-run benchmarks and tile-level logging.
 
 Real systems rarely run a single accelerator in isolation. This project asks:
+
 > When BOOM, two Rocket cores, and Gemmini share DRAM and L2, who actually owns the
 > memory path, and what does it take to keep Gemmini’s speedups intact?
 
@@ -42,7 +43,8 @@ Real systems rarely run a single accelerator in isolation. This project asks:
 
 ## Research questions
 
-1. How do we **reproduce and control** shared-memory contention in a BOOM+Rocket+Gemmini SoC?
+1. How do we **reproduce and control** shared-memory contention in a
+   BOOM + Rocket + Gemmini SoC?
 2. Under co-run bandwidth stress, **how much** can a 256×256 GEMM slow down and why?
 3. Which changes—DRAM channels, L2 banking, memory-controller tuning, or scheduling—
    actually restore both **throughput** and **predictability**?
@@ -59,8 +61,8 @@ I first built a reusable co-run framework on a heterogeneous SoC:
     - 2-channel / default L2.
     - 2-channel / 4-bank L2 with tuned memory-controller parameters.
 - **Harts.**
-  - Hart 0 – Rocket#1: linear memory **bandwidth stressor**.
-  - Hart 1 – Rocket#2: independent bandwidth stressor.
+  - Hart 0 – Rocket #1: linear memory **bandwidth stressor**.
+  - Hart 1 – Rocket #2: independent bandwidth stressor.
   - Hart 2 – BOOM: Gemmini host running GEMM kernels.
 - **Co-run benchmarks.**
   - `hetero_gemm_bwtest-baremetal`
