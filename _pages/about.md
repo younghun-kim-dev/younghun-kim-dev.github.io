@@ -1,34 +1,119 @@
 ---
 layout: about
-title: about
+title: "Younghun Kim"
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Motto. Etc.
+subtitle: "Memory-Centric Architectures for Accelerator-Rich Systems"
 
 profile:
   align: right
   image: younghun.jpg
-  image_circular: false # crops the image to make it circular
+  image_circular: false
   more_info: >
-    <p>555 your office number</p>
-    <p>123 your address street</p>
-    <p>Your City, State 12345</p>
+    <p>Seoul, Republic of Korea</p>
+    <p><a href="mailto:younghun0613@yonsei.ac.kr">younghun0613@yonsei.ac.kr</a></p>
+    <p><a href="https://github.com/younghun-kim-dev" target="_blank">github.com/younghun-kim-dev</a></p>
 
-selected_papers: true # includes a list of papers marked as "selected={true}"
-social: true # includes social icons at the bottom of the page
+selected_papers: false
+social: true
 
 announcements:
-  enabled: true # includes a list of news items
-  scrollable: true # adds a vertical scroll bar if there are more than 3 news items
-  limit: 5 # leave blank to include all the news in the `_news` folder
+  enabled: false
+  scrollable: true
+  limit: 5
 
 latest_posts:
-  enabled: true
-  scrollable: true # adds a vertical scroll bar if there are more than 3 new posts items
-  limit: 3 # leave blank to include all the blog posts
+  enabled: false
+  scrollable: true
+  limit: 3
 ---
 
-Write your biography here. Tell the world about yourself. Link to your favorite [subreddit](http://reddit.com). You can put a picture in, too. The code is already in, just name your picture `prof_pic.jpg` and put it in the `img/` folder.
+I work on **memory-centric architectures for accelerator-rich systems**.  
+Using Chipyard, Gemmini, and FireSim, I study when accelerator speedups
+survive real cache hierarchies, DRAM, and schedulers instead of collapsing
+under contention.
 
-Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page](/al-folio/publications/) automatically.
+I am a **Co-Founder & Systems Architect at Berify, Inc.** (Bitcoin
+hardware-wallet startup) and earned a **B.S. in Civil & Environmental
+Engineering** from Yonsei University (CGPA 4.23/4.30, rank 1/46, summa cum
+laude). My civil-engineering training in flows and bottlenecks now shapes how
+I reason about data movement, memory hierarchies, and shared resources in
+heterogeneous SoCs.
 
-Link to your social media connections, too. This theme is set up to use [Font Awesome icons](https://fontawesome.com/) and [Academicons](https://jpswalsh.github.io/academicons/), like the ones below. Add your Facebook, Twitter, LinkedIn, Google Scholar, or just disable all of them.
+---
+
+## Research focus
+
+- Data movement, memory hierarchy, and cache coherence under real workloads  
+- Shared-memory contention & scheduling on heterogeneous RISC-V SoCs  
+- Hardware–software co-design of accelerator interfaces, memory systems, and runtimes  
+
+---
+
+## Chipyard highlight projects
+
+<div class="row">
+
+<div class="col-md-4">
+  <figure>
+    <img src="/assets/img/sha3_speedup_vs_size_with_arrow_colored.png"
+         alt="SHA-3 speedup vs message size with multi-bank L2 improvement"
+         style="max-width:100%; border-radius:4px;">
+  </figure>
+  <p><strong><a href="https://github.com/younghun-kim-dev/chipyard/tree/chipyard_sha3" target="_blank">
+    SHA3 Accelerator Performance Stabilization
+  </a></strong></p>
+  <p style="font-size:0.95rem;">
+    Independent project on when SHA-3 accelerator speedups persist as message
+    sizes scale. Single-bank L2 drops speedup from 206× to ~120× at 557&nbsp;KB;
+    a multi-bank inclusive L2 recovers ≈34% throughput and restores large-input
+    behavior toward the ~170× plateau.
+  </p>
+</div>
+
+<div class="col-md-4">
+  <figure>
+    <img src="/assets/img/boomgemmini_mac100_before_after.png"
+         alt="Gemmini MAC/100 cycles before and after memory-pipeline optimization"
+         style="max-width:100%; border-radius:4px;">
+  </figure>
+  <p><strong><a href="https://github.com/younghun-kim-dev/chipyard/tree/chipyard_gemmini" target="_blank">
+    Gemmini Offload Thresholds & Memory-Centric Pipeline Co-Design
+  </a></strong></p>
+  <p style="font-size:0.95rem;">
+    WS/OS GEMM framework comparing CPU and Gemmini across sizes. Identified
+    overhead-dominated vs bandwidth-limited regimes and co-designed scratchpad
+    banking, bus width, and DMA alignment, lowering offload thresholds and
+    improving 1024³ throughput by ≈58% (validated on FireSim).
+  </p>
+</div>
+
+<div class="col-md-4">
+  <figure>
+    <img src="/assets/img/fig1_gemm_latency.png"
+         alt="GEMM latency versus memory topology and stress"
+         style="max-width:100%; border-radius:4px;">
+  </figure>
+  <p><strong><a href="https://github.com/younghun-kim-dev/chipyard/tree/chipyard_hetero" target="_blank">
+    Heterogeneous SoC Memory Contention
+  </a></strong></p>
+  <p style="font-size:0.95rem;">
+    BOOM&nbsp;+&nbsp;Rocket&nbsp;+&nbsp;Gemmini co-run profiling with a bandwidth stress generator
+    and per-tile logging. DRAM saturation and L2 bank contention slowed 256×256
+    GEMM by ~3×; tuned memory-controller parameters and phase-aware scheduling
+    raised aggregate throughput by up to 2.7× and tightened tile-latency bands.
+  </p>
+</div>
+
+</div>
+
+---
+
+## Background
+
+- **Co-Founder & Systems Architect, Berify, Inc.** – secure device software,
+  entropy pipeline design (external TRNG + NIST SP 800-90B / Dieharder), and
+  reproducible Buildroot-based OS images with CI.
+- **B.S., Civil & Environmental Engineering, Yonsei University** – CGPA
+  4.23/4.30, major GPA 4.28/4.30, rank 1/46, summa cum laude.
+
+For more detail, see my [full CV](/cv/).
