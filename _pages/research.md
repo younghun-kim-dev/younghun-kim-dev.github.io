@@ -49,7 +49,7 @@ I prototype on **Chipyard RISC-V SoCs** (Rocket, BOOM, Gemmini, custom RoCCs) us
 - Identified **overhead-dominated small matrices** and **bandwidth-limited large matrices**, showing where the accelerator is underutilized.
 - Co-designed **SPM/ACC banking**, **system bus width**, and **DMA width alignment**, lowering offload thresholds and improving **1024³ throughput by ≈58%**, validated on **FireSim**.
 
-**Takeaway:** offloading is **not always good**—the critical **\(K^*(M,N)\)** is a measurable function of tile shape, memory layout, and hierarchy.
+**Takeaway:** offloading is **not always good**—the critical **\(K^\*(M,N)\)** is a measurable function of tile shape, memory layout, and hierarchy.
 
 ---
 
@@ -74,8 +74,8 @@ Across these projects, I use a **measurement-first, integration-first** loop:
 
 Tool stack (selected):
 
-- **Architecture & RTL**: Chipyard, BOOM, Rocket, Gemmini, RoCC, Verilog/SystemVerilog, Chisel/Scala  
-- **Simulation & emulation**: Verilator + DRAMSim2, FireSim on AWS EC2 F1  
+- **Architecture & RTL**: Chipyard, BOOM, Rocket, Gemmini, RoCC, Verilog/SystemVerilog, Chisel/Scala
+- **Simulation & emulation**: Verilator + DRAMSim2, FireSim on AWS EC2 F1
 - **Systems**: Linux, Buildroot, Docker, Git/CI
 
 ---
@@ -94,6 +94,7 @@ I plan to extend this line of work to:
 Ultimately, I want to build **memory-centric accelerator platforms that keep their promises**: when real memory systems and multi-tenant workloads appear, performance should **degrade gracefully**, not collapse.
 
 For concrete figures and code, see the [Projects](/projects/) page and the corresponding branches in my Chipyard fork:
+
 - `chipyard_sha3`
 - `chipyard_gemmini`
 - `chipyard_hetero`

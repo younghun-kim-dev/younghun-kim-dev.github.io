@@ -281,70 +281,32 @@
       "name": "Programming & Systems",
       "level": "",
       "icon": "",
-      "keywords": [
-        "Python",
-        "C/C++",
-        "MATLAB",
-        "Linux",
-        "Docker",
-        "Git/CI/CD"
-      ]
+      "keywords": ["Python", "C/C++", "MATLAB", "Linux", "Docker", "Git/CI/CD"]
     },
     {
       "name": "RISC-V & Accelerator Stacks",
       "level": "",
       "icon": "",
-      "keywords": [
-        "Chipyard",
-        "RoCC",
-        "Gemmini",
-        "FireSim",
-        "LiteX/VexRiscv",
-        "Vortex",
-        "FPGA (Xilinx)"
-      ]
+      "keywords": ["Chipyard", "RoCC", "Gemmini", "FireSim", "LiteX/VexRiscv", "Vortex", "FPGA (Xilinx)"]
     },
     {
       "name": "RTL/EDA & HW–SW Co-Design",
       "level": "",
       "icon": "",
-      "keywords": [
-        "Verilog/SystemVerilog",
-        "Scala/Chisel",
-        "Vivado",
-        "Verilator",
-        "Yosys",
-        "LLVM/Clang"
-      ]
+      "keywords": ["Verilog/SystemVerilog", "Scala/Chisel", "Vivado", "Verilator", "Yosys", "LLVM/Clang"]
     },
     {
       "name": "Embedded & Security Systems",
       "level": "",
       "icon": "",
-      "keywords": [
-        "Buildroot",
-        "OpenSSL",
-        "libsodium",
-        "AES",
-        "SHA-2/3",
-        "GPG",
-        "TRNG/HWRNG",
-        "NIST SP 800-90B",
-        "Dieharder"
-      ]
+      "keywords": ["Buildroot", "OpenSSL", "libsodium", "AES", "SHA-2/3", "GPG", "TRNG/HWRNG", "NIST SP 800-90B", "Dieharder"]
     }
   ],
   "interests": [
     {
       "name": "Memory-Centric Architectures for Accelerator-Rich Systems",
       "icon": "",
-      "keywords": [
-        "Data movement",
-        "Memory hierarchy",
-        "Cache coherence",
-        "Hardware–software co-design",
-        "Heterogeneous SoCs"
-      ]
+      "keywords": ["Data movement", "Memory hierarchy", "Cache coherence", "Hardware–software co-design", "Heterogeneous SoCs"]
     }
   ],
   "languages": [],

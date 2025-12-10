@@ -45,8 +45,8 @@ and DMA** to fix them.
    overhead-dominated vs bandwidth-dominated regimes?
 2. On a BOOM + Gemmini SoC, how much of the “missing” performance is really in the
    **memory pipeline**, not the MAC array?
-3. For small/medium GEMM tiles, what is the **offload threshold \(K^*(M,N)\)** where Gemmini first
-   beats the CPU, and how does memory-path design shift \(K^*\)?
+3. For small/medium GEMM tiles, what is the **offload threshold \(K^\*(M,N)\)** where Gemmini first
+   beats the CPU, and how does memory-path design shift \(K^\*\)?
 
 ---
 
@@ -108,7 +108,7 @@ memory**, very different perceived accelerator.
 
 ---
 
-## Part 3 – CPU vs Gemmini offload threshold \(K^*\)
+## Part 3 – CPU vs Gemmini offload threshold \(K^\*\)
 
 To quantify **when offloading is actually worthwhile**, I built a small-tile threshold pipeline on a
 BOOM + Gemmini SoC:

@@ -18,4 +18,4 @@ toc:
 ---
 
 My full curriculum vitae is available as a downloadable PDF above.  
-The structured CV below is generated from <code>_data/cv.yml</code>.
+The structured CV below is generated from <code>\_data/cv.yml</code>.
