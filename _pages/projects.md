@@ -4,7 +4,7 @@ title: Projects
 permalink: /projects/
 description: Independent Chipyard research line and selected systems projects.
 nav: true
-nav_order: 3
+nav_order: 4
 ---
 
 This page highlights my independent research line in **memory-centric architectures for accelerator-rich RISC-V systems** and a few related systems projects. For a full list of experience and coursework, see my [CV](/cv/).
