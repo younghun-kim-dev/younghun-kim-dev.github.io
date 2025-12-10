@@ -1,0 +1,18 @@
+- title: "About"
+  url: "/"
+
+- title: "Research"
+  url: "/projects/"
+  sublinks:
+    - title: "Heterogeneous SoC Memory Contention"
+      url: "https://github.com/younghun-kim-dev/chipyard/tree/chipyard_hetero"
+    - title: "Gemmini Offload Thresholds & Pipeline Co-Design"
+      url: "https://github.com/younghun-kim-dev/chipyard/tree/chipyard_gemmini"
+    - title: "SHA3 Accelerator Performance Stabilization"
+      url: "https://github.com/younghun-kim-dev/chipyard/tree/chipyard_sha3"
+
+- title: "CV"
+  url: "/cv/"
+
+- title: "GitHub"
+  url: "https://github.com/younghun-kim-dev"
