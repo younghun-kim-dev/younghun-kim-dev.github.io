@@ -27,7 +27,7 @@
       </button>
 
       <div class="collapse navbar-collapse text-right" id="navbarNav">
-        <ul class="navbar-nav {% if page.permalink == '/' %}mx-auto{% else %}ml-auto{% endif %} flex-nowrap">
+        <ul class="navbar-nav w-100 justify-content-around flex-nowrap">
           {% for page in site.pages %}
             {% if page.permalink == '/' %} {% assign about_title = page.title %} {% endif %}
           {% endfor %}
