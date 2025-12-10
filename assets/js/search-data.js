@@ -493,9 +493,9 @@ ninja.data = [{
               window.location.href = "/projects/chipyard_hetero";
             },},{id: "projects-sha3-accelerator-performance-stabilization-in-chipyard",
           title: 'SHA3 Accelerator Performance Stabilization in Chipyard',
-          description: "When does a SHA-3 accelerator stay ~170× faster, and when does single-bank L2 quietly turn it into a 120× accelerator?",
+          description: "Independent Chipyard project analyzing when SHA-3 accelerator speedups survive as message sizes scale, and how multi-bank L2 design restores large-input performance.",
           section: "Projects",handler: () => {
-              window.location.href = "/projects/chipyard_sha3";
+              window.location.href = "/projects/chipyard_sha3/";
             },},{
         id: 'social-email',
         title: 'email',
