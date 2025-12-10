@@ -488,9 +488,9 @@ ninja.data = [{
               window.location.href = "/projects/chipyard_gemmini/";
             },},{id: "projects-heterogeneous-soc-memory-contention-diagnosis-amp-mitigation",
           title: 'Heterogeneous SoC Memory Contention: Diagnosis &amp;amp; Mitigation',
-          description: "BOOM + 2×Rocket + Gemmini co-run profiling that turns noisy slowdowns into a measured, fixable memory-path problem.",
+          description: "Co-run profiling on a BOOM + 2×Rocket + Gemmini SoC to understand how shared memory contention shapes accelerator behavior and how DRAM/L2 topology and phase-aware scheduling restore predictable speedups.",
           section: "Projects",handler: () => {
-              window.location.href = "/projects/chipyard_hetero";
+              window.location.href = "/projects/chipyard_hetero/";
             },},{id: "projects-sha3-accelerator-performance-stabilization-in-chipyard",
           title: 'SHA3 Accelerator Performance Stabilization in Chipyard',
           description: "Independent Chipyard project analyzing when SHA-3 accelerator speedups survive as message sizes scale, and how multi-bank L2 design restores large-input performance.",
