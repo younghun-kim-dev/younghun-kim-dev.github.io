@@ -486,6 +486,11 @@ ninja.data = [{
           description: "When should GEMM stay on the CPU, when should it move to Gemmini, and how does the memory path shift that boundary?",
           section: "Projects",handler: () => {
               window.location.href = "/projects/chipyard_gemmini";
+            },},{id: "projects-heterogeneous-soc-memory-contention-diagnosis-amp-mitigation",
+          title: 'Heterogeneous SoC Memory Contention: Diagnosis &amp;amp; Mitigation',
+          description: "BOOM + 2×Rocket + Gemmini co-run profiling that turns noisy slowdowns into a measured, fixable memory-path problem.",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/chipyard_hetero";
             },},{id: "projects-sha3-accelerator-performance-stabilization-in-chipyard",
           title: 'SHA3 Accelerator Performance Stabilization in Chipyard',
           description: "When does a SHA-3 accelerator stay ~170× faster, and when does single-bank L2 quietly turn it into a 120× accelerator?",
