@@ -1,5 +1,5 @@
 ---
-layout: project
+layout: page
 title: "Heterogeneous SoC Memory Contention: Diagnosis & Mitigation"
 permalink: /projects/chipyard_hetero/
 description: >
