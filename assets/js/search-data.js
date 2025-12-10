@@ -481,6 +481,11 @@ ninja.data = [{
           description: "another project with an image 🎉",
           section: "Projects",handler: () => {
               window.location.href = "/projects/9_project/";
+            },},{id: "projects-sha3-accelerator-performance-stabilization-in-chipyard",
+          title: 'SHA3 Accelerator Performance Stabilization in Chipyard',
+          description: "When does a SHA-3 accelerator stay ~170× faster, and when does single-bank L2 quietly turn it into a 120× accelerator?",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/chipyard_sha3";
             },},{
         id: 'social-email',
         title: 'email',
