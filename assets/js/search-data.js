@@ -24,8 +24,8 @@ ninja.data = [{
             window.location.href = "/publications/";
           },
         },{id: "nav-projects",
-          title: "projects",
-          description: "A growing collection of your cool projects.",
+          title: "Projects",
+          description: "Independent Chipyard research line and selected systems projects.",
           section: "Navigation",
           handler: () => {
             window.location.href = "/projects/";
