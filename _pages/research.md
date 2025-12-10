@@ -4,7 +4,7 @@ title: Research
 permalink: /research/
 description: Memory-centric architectures for accelerator-rich systems.
 nav: true
-nav_order: 2
+nav_order: 3
 ---
 
 My work focuses on **memory-centric architectures for accelerator-rich systems**. I study when accelerator speedups survive real cache hierarchies, DRAM, and schedulers instead of collapsing once they share memory with other workloads.
