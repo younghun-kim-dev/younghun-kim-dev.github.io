@@ -7,117 +7,93 @@ nav: true
 nav_order: 3
 ---
 
-My work focuses on **memory-centric architectures for accelerator-rich systems**. I study when accelerator speedups survive real cache hierarchies, DRAM, and schedulers instead of collapsing once they share memory with other workloads.
+My work focuses on **memory-centric architectures for accelerator-rich systems**: I study when accelerator speedups survive real cache hierarchies, DRAM, and schedulers instead of collapsing once they share memory.
 
-A single hardware-wallet security review failure pushed me toward this question: we had integrated crypto accelerators for speed, but overlooked data movement that compromised key isolation. Fixing that flaw led me to treat **data movement as the core of architectural reasoning**, not an afterthought.
+A failed hardware-wallet security review pushed me to treat **data movement as the core of architectural reasoning** rather than an afterthought: crypto accelerators were fast, but unsafe data paths broke key isolation. The same patterns now guide how I analyze accelerators on RISC-V SoCs.
 
 ---
 
-## Core research question
+## Core question & themes
 
 > Under what memory-system and sharing conditions do accelerator speedups  
 > survive integration versus collapse at scale?
 
-To answer this, I use RISC-V SoCs built with **Chipyard**, **Gemmini**, and **custom RoCC accelerators**, and run them under **cycle-accurate simulation (Verilator + DRAMSim2)** and **FPGA-accelerated emulation (FireSim on AWS EC2 F1)**.
+**Themes**
 
-### Themes
+- **Data movement & memory hierarchy**  
+  How L1/L2 structure, banking, and DRAM topology limit accelerators long before compute saturates.
+- **Shared-memory contention & predictability**  
+  How co-running CPU/accelerator workloads reshape throughput and tail latency.
+- **Hardware–software co-design**  
+  Using schedulers and offload policies together with memory-path changes to keep performance in a tight, predictable band.
 
-- **Data movement & memory hierarchy**
-  - How L1/L2 design, banking, and DRAM topology limit accelerators long before compute saturates.
-- **Shared-memory contention & predictability**
-  - How co-running workloads on CPUs and accelerators reshape throughput and tail latency.
-- **Hardware–software co-design**
-  - Using runtime policies (scheduling, offload decisions) together with architectural changes to keep performance in a tight, predictable band.
+I prototype on **Chipyard RISC-V SoCs** (Rocket, BOOM, Gemmini, custom RoCCs) using **Verilator + DRAMSim2** and scale to FPGA-based emulation with **FireSim on AWS EC2 F1**.
 
 ---
 
 ## Independent Chipyard research line
 
-### 1. SHA-3 accelerator: speedups vs message size
+### 1. SHA-3 accelerator: speedups vs message size (`chipyard_sha3`)
 
-I started with an **independent Chipyard project** analyzing when SHA-3 accelerator speedups persist as message sizes scale.
+- Integrated a **SHA-3 RoCC** with Rocket/BOOM and built an automated pipeline for messages from 136&nbsp;B to 544&nbsp;KB.
+- Found speedup collapsing from **206× → 120×** at large sizes due to a **single-bank inclusive L2**, not the accelerator itself.
+- Redesigned the L2 as a **multi-bank inclusive cache**, recovering ≈**34% throughput** at 557&nbsp;KB and pulling behavior back toward the ~170× speedup plateau.
 
-- Integrated a **SHA-3 RoCC** with a Rocket core and built an **automated benchmark pipeline** for messages from 136&nbsp;B to 544&nbsp;KB.
-- Cycle-accurate Verilator traces showed that, as sizes grew, speedup shrank from **206× → 120×** even though the accelerator itself was not saturated.
-- The culprit was a **single-bank inclusive L2**: misses, refills, and coherence traffic serialized on one bank, stalling the SHA-3 accelerator.
-- I **redesigned the inclusive L2 as a multi-banked cache**, increasing capacity and sub-banking concurrency.
-- At 557&nbsp;KB, this raised SHA-3 speedup from **120.27× → 160.90×** (≈34% throughput gain), pulling large-input behavior back toward the ~170× plateau.
-
-This project convinced me that “headline speedups” only mean anything when paired with a **memory-path design that scales to realistic working sets**.
+**Takeaway:** headline accelerator speedups are only meaningful with a **memory path that scales** to realistic working sets.
 
 ---
 
-### 2. Gemmini: offload thresholds & memory-centric pipeline co-design
+### 2. Gemmini: offload thresholds & memory pipeline (`chipyard_gemmini`)
 
-Next, I asked whether **matrix GEMM workloads** on a systolic array would show the same memory-path limits.
+- Built a **WS/OS GEMM framework** comparing CPU vs Gemmini across matrix sizes and shapes, measuring cycles and MAC/100 cycles.
+- Identified **overhead-dominated small matrices** and **bandwidth-limited large matrices**, showing where the accelerator is underutilized.
+- Co-designed **SPM/ACC banking**, **system bus width**, and **DMA width alignment**, lowering offload thresholds and improving **1024³ throughput by ≈58%**, validated on **FireSim**.
 
-- Built a **WS/OS benchmarking framework** comparing CPU and Gemmini across matrix sizes, measuring cycles and MAC/100 cycles.
-- Identified two regimes:
-  - **Small matrices**: dominated by launch and data-movement overheads; accelerator underutilized.
-  - **Large matrices**: dominated by **bandwidth and tiling**, with MAC utilization plateauing.
-- Co-designed the **memory pipeline**:
-  - Re-banked and resized Gemmini scratchpad/accumulator.
-  - Widened the system bus beat width.
-  - Aligned Gemmini DMA width to the memory system.
-- These changes **lowered offload thresholds** (making Gemmini worthwhile for smaller tiles) and improved **1024³ GEMM throughput by ≈58%**, validated on **FireSim (AWS EC2 F1)**.
-- A separate offload-threshold study showed that offloading is not “always good”: the **critical K\*(M, N)** depends strongly on tile shape, memory layout, and hierarchy.
-
-Here, the main result was a **quantitative, reusable pipeline** for deciding *when* to offload to an accelerator under a given memory system.
+**Takeaway:** offloading is **not always good**—the critical **\(K^*(M,N)\)** is a measurable function of tile shape, memory layout, and hierarchy.
 
 ---
 
-### 3. Heterogeneous SoC memory contention: BOOM + Rocket + Gemmini
+### 3. Heterogeneous SoC memory contention (`chipyard_hetero`)
 
-Real systems rarely run a single accelerator in isolation, so my next question was how **shared-memory contention** shapes accelerator behavior when workloads co-run.
+- Built a **co-run profiling framework** on a BOOM + 2×Rocket + Gemmini SoC with configurable DRAM/L2 topology.
+- Showed that with a single DRAM channel and default L2, co-run stress slows a 256×256 GEMM by ≈**3×** via **DRAM saturation** and **L2 bank contention**.
+- Combining **2 DRAM channels + 4-bank L2 + tuned memory-controller parameters** and **phase-aware scheduling** recovered throughput by up to **2.7×** and tightened tile-latency bands.
 
-- Built a **co-run profiling framework** on a heterogeneous RISC-V SoC with **BOOM + 2×Rocket + Gemmini**, plus a configurable memory topology.
-- Implemented a **bandwidth stress generator** on the Rocket cores and **cycle-accurate per-tile/per-kernel logging** for Gemmini.
-- Sensitivity sweeps showed that, under 8&nbsp;MiB co-run stress with a single-channel DRAM and default L2:
-  - A 256×256 GEMM slowed by ≈**3×**.
-  - **DRAM bandwidth saturation** and **L2 bank contention** created long, structured stalls.
-- Adding **more DRAM channels alone** helped only modestly; the shared L2 remained a bottleneck.
-- Combining **2 DRAM channels + 4-bank L2 + tuned memory-controller parameters** pulled GEMM latency back near the low-stress regime and tightened tile-latency distributions.
-- A lightweight **phase-aware scheduling** policy that staggered peaks across co-running workloads raised **aggregate throughput by up to 2.7×** and reduced jitter.
-
-This project showed that, under contention, **memory topology and scheduling, not raw compute, dominate observed accelerator behavior**.
+**Takeaway:** under contention, **memory topology and scheduling**, not raw compute, dominate accelerator behavior.
 
 ---
 
-## Methodology and tools
+## Methodology & tools
 
-Across these projects, I follow a consistent **measurement-first, integration-first** methodology:
+Across these projects, I use a **measurement-first, integration-first** loop:
 
-- **Start from integration, not from peak FLOPs**
-  - Design experiments that include caches, coherence, DRAM timing, and co-running workloads from the beginning.
-- **Use cycle-accurate tools, then accelerated platforms**
-  - Prototype in **Chipyard + Verilator + DRAMSim2**, then move heavy workloads to **FireSim on AWS F1** when needed.
-- **Trace memory paths explicitly**
-  - Collect UART logs, cycle dumps, and per-tile/per-phase traces to separate compute, cache, and DRAM effects.
-- **Close the loop with co-design**
-  - Use measurements to drive coordinated changes in **accelerator interfaces, memory hierarchy, and runtime policies** (e.g., offload thresholds, schedulers).
+- Start from **full systems** (caches, coherence, DRAM timing, co-running workloads), not idealized standalone accelerators.
+- Use **Chipyard + Verilator + DRAMSim2** for cycle-accurate traces, then move to **FireSim** when workloads or interference patterns outgrow software simulation.
+- Trace the **memory path explicitly** (UART logs, per-tile/per-phase cycles) to separate compute vs cache vs DRAM effects.
+- Use these measurements to co-design **accelerator interfaces, memory hierarchies, and runtime policies** (offload thresholds, schedulers).
 
 Tool stack (selected):
 
-- **Architecture & RTL**: Chipyard, BOOM, Rocket, Gemmini, RoCC, Verilog/SystemVerilog, Chisel/Scala
-- **Simulation & emulation**: Verilator + DRAMSim2, FireSim on AWS EC2 F1
+- **Architecture & RTL**: Chipyard, BOOM, Rocket, Gemmini, RoCC, Verilog/SystemVerilog, Chisel/Scala  
+- **Simulation & emulation**: Verilator + DRAMSim2, FireSim on AWS EC2 F1  
 - **Systems**: Linux, Buildroot, Docker, Git/CI
 
 ---
 
 ## Longer-term directions
 
-Going forward, I want to generalize these ideas beyond single-node RISC-V prototypes:
+I plan to extend this line of work to:
 
-- **Multi-accelerator, multi-tenant systems**
-  - Extending my co-run and offload-threshold analyses to systems where multiple accelerators (e.g., matrix engines, crypto, DSAs) share memory and interconnects.
-- **Emerging memory systems**
-  - Applying the same bandwidth-sensitivity and contention profiling to **CXL-based tiered memory**, **processing-in-memory**, and **chiplet-based DRAM** architectures.
-- **Predictable performance under shared resources**
-  - Developing **design rules and runtime policies** that keep accelerator platforms within a tight, predictable performance band under realistic contention and power limits.
+- **Multi-accelerator, multi-tenant systems**  
+  Scaling co-run and offload-threshold analyses to multiple DSAs sharing memory and interconnects.
+- **Emerging memory systems**  
+  Applying bandwidth-sensitivity and contention profiling to **CXL-based tiered memory**, **PIM**, and **chiplet DRAM**.
+- **Predictable performance under shared resources**  
+  Developing **design rules and runtime policies** that keep accelerators within a tight performance band under contention and power limits.
 
-Ultimately, I aim to build **memory-centric accelerator platforms that keep their promises**: when multiple tenants and real memory systems enter the picture, performance should degrade gracefully, not collapse unexpectedly.
+Ultimately, I want to build **memory-centric accelerator platforms that keep their promises**: when real memory systems and multi-tenant workloads appear, performance should **degrade gracefully**, not collapse.
 
-For concrete technical details and plots, see the [Projects](/projects/) page and the associated branches in my Chipyard fork:
+For concrete figures and code, see the [Projects](/projects/) page and the corresponding branches in my Chipyard fork:
 - `chipyard_sha3`
 - `chipyard_gemmini`
 - `chipyard_hetero`
