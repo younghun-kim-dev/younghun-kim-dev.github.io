@@ -483,9 +483,9 @@ ninja.data = [{
               window.location.href = "/projects/9_project/";
             },},{id: "projects-gemmini-offload-thresholds-amp-memory-centric-pipeline-co-design",
           title: 'Gemmini Offload Thresholds &amp;amp; Memory-Centric Pipeline Co-Design',
-          description: "When should GEMM stay on the CPU, when should it move to Gemmini, and how does the memory path shift that boundary?",
+          description: "Independent Gemmini project studying CPU vs Gemmini offload thresholds and how memory-path co-design (SPM/ACC banking, bus widths, DMA alignment) shifts those thresholds and large-matrix throughput.",
           section: "Projects",handler: () => {
-              window.location.href = "/projects/chipyard_gemmini";
+              window.location.href = "/projects/chipyard_gemmini/";
             },},{id: "projects-heterogeneous-soc-memory-contention-diagnosis-amp-mitigation",
           title: 'Heterogeneous SoC Memory Contention: Diagnosis &amp;amp; Mitigation',
           description: "BOOM + 2×Rocket + Gemmini co-run profiling that turns noisy slowdowns into a measured, fixable memory-path problem.",
