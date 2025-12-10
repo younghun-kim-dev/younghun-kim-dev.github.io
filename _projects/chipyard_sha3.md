@@ -19,6 +19,12 @@ links:
   github: "https://github.com/younghun-kim-dev/chipyard/tree/chipyard_sha3"
 ---
 
+<p class="mt-3 mb-4">
+  <a href="{{ '/projects/' | relative_url }}" class="btn btn-outline-secondary">
+    &larr; Back to Projects
+  </a>
+</p>
+
 ## Overview
 
 - **Goal.** Understand under what memory-system and sharing conditions a SHA-3 RoCC
