@@ -34,10 +34,11 @@ links:
   custom benchmarking scripts in `sims/verilator/`.
 
 A hardware-wallet security failure pushed me toward a simple question:
+
 > If an accelerator advertises a 200× speedup, under what memory conditions does that
 > speedup actually survive?
 
-This project takes SHA-3 as a concrete case and shows that a single-bank inclusive L2
+This project uses SHA-3 as a concrete case and shows that a single-bank inclusive L2
 can silently turn a “~170× accelerator” into a “120× accelerator” at scale, and that
 a multi-bank L2 almost completely recovers the loss.
 
@@ -49,7 +50,8 @@ As message size scales from **136 B → 557 KB**, I asked:
 
 1. **When does the SHA-3 RoCC keep its headline speedups (≈170–200×)?**
 2. **When and why do speedups collapse, even though the accelerator core is unchanged?**
-3. **Which part of the memory path (L1, TLB, L2 banking, DRAM channels) is responsible?**
+3. **Which part of the memory path (L1, TLB, L2 banking, DRAM channels) is
+   responsible?**
 
 ---
 
