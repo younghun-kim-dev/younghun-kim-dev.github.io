@@ -1,101 +1,169 @@
 ---
 layout: project
 title: "Gemmini Offload Thresholds & Memory-Centric Pipeline Co-Design"
-permalink: /projects/chipyard_gemmini
-description: "When should GEMM stay on the CPU, when should it move to Gemmini, and how does the memory path shift that boundary?"
-category: research
-importance: 2
+permalink: /projects/chipyard_gemmini/
+description: >
+  Independent Gemmini project studying CPU vs Gemmini offload thresholds and
+  how memory-path co-design (SPM/ACC banking, bus widths, DMA alignment) shifts
+  those thresholds and large-matrix throughput.
 image: /assets/img/boomgemmini_mac100_before_after.png
+category: work
+importance: 1
+tags:
+  - Chipyard
+  - RISC-V
+  - Gemmini
+  - memory systems
+  - accelerators
 links:
-  - name: GitHub branch
-    url: https://github.com/younghun-kim-dev/chipyard/tree/chipyard_gemmini
+  github: "https://github.com/younghun-kim-dev/chipyard/tree/chipyard_gemmini"
 ---
 
-Independent Gemmini follow-up project testing whether **matrix GEMM workloads share the same memory-path limits** I saw in SHA-3. I built a **WS/OS GEMM framework** comparing CPU and Gemmini across matrix sizes, identified two regimes (overhead-dominated vs bandwidth-limited), and co-designed **scratchpad banking, bus width, and DMA alignment**. The optimized memory pipeline improves **1024³** throughput by ≈**58%** and lowers the **CPU↔Gemmini offload threshold K\***, validated on FireSim (AWS EC2 F1).
+## Overview
 
----
+- **Goal.** Determine **when** GEMM workloads should be offloaded to Gemmini vs left
+  on the CPU, and **how memory-path design shifts that boundary**.
+- **Timeline.** Jun. 2025 – Aug. 2025 (independent follow-up to the SHA-3 project).
+- **Stack.** Gemmini + Chipyard (Rocket / BOOM), Verilator + DRAMSim2,
+  FireSim (AWS EC2 F1), custom WS/OS benchmarking and threshold scripts.
 
-## Key questions
-
-- For GEMM, when is it actually worth offloading to Gemmini instead of staying on the CPU?
-- Do GEMM workloads exhibit the same **“compute is cheap, data movement sets the pace”** behavior as SHA-3?
-- How much of the missing performance is in **Gemmini’s memory path** (SPM/ACC, buses, DMA), not its MAC array?
-
----
-
-## Part 1 – RocketConfig WS/OS baseline
-
-![MAC/100cyc vs matrix size (Rocket + Gemmini)](/assets/img/gemminirocket_mac100_vs_M.png)
-
-- **Setup**
-  - SoC: **GemminiRocketConfig** (Rocket core + Gemmini).
-  - Sweep **M = N = K ∈ {8, …, 2048}**, with **WS** and **OS** dataflows.
-  - Metrics: cycles, **MAC/100cyc**, correctness checks.
-
-- **Findings**
-  - Clear **two-regime behavior**:
-    - Small matrices (≤32): dominated by **launch + data-movement overheads**.
-    - Large matrices (≥256): **MAC/100cyc plateaus** → **bandwidth / tiling** dominate.
-  - **WS > OS** across all sizes in both latency and MAC utilization.
-  - This curve becomes the **baseline** for later BOOM+Gemmini and memory-path changes.
+After seeing SHA-3 speedups collapse under a narrow L2, I wanted to know whether
+matrix compute on a systolic array would exhibit the same memory-path limits and how
+to **co-design scratchpads, buses, and DMA** to fix them.
 
 ---
 
-## Part 2 – BOOM+Gemmini memory-pipeline co-design
+## Research questions
 
-![WS/OS MAC/100cyc – before vs after memory-pipeline optimization](/assets/img/boomgemmini_mac100_before_after.png)
-
-- **Setup**
-  - SoCs:
-    - **Before:** `GemminiLargeBoomV4Config`.
-    - **After:** `GemminiLargeBoomV43Config`.
-  - Changes implemented as Gemmini/Chipyard **config mixins**:
-    - Scratchpad/accumulator (**SPM/ACC**) banking & sizing.
-    - System-bus beat width.
-    - Gemmini **DMA bus-width alignment**.
-  - Workload: one-shot GEMM with **M = N = K ∈ {8, …, 1024}**, WS/OS.
-
-- **Results (selected MAC/100cyc)**
-
-  - At **1024³**:
-    - WS: **16,047 → 25,433 MAC/100cyc** (≈**+58%** throughput).
-    - OS: **13,828 → 17,004 MAC/100cyc** (≈**+23%** throughput).
-  - Similar gains at 256–512³ show that the gap is **systematic**, not a one-off artifact.
-
-- **Interpretation**
-  - **Same MAC array, different memory path**:
-    - The “missing” performance was sitting in **SPM/ACC layout, bus width, and DMA alignment**.
-    - Memory-centric co-design raises Gemmini into a **higher-throughput plateau** without changing compute.
+1. On a simple Rocket+Gemmini SoC, how do **WS/OS GEMM** behaviors split into
+   overhead-dominated vs bandwidth-dominated regimes?
+2. On a BOOM+Gemmini SoC, how much of the “missing” performance is really in the
+   **memory pipeline**, not the MAC array?
+3. For small/medium GEMM tiles, what is the **offload threshold \(K^*(M,N)\)** where
+   Gemmini first beats the CPU, and how does memory-path design shift \(K^*\)?
 
 ---
 
-## Part 3 – CPU vs Gemmini offload threshold K\*
+## Part 1 – WS/OS baseline: Rocket + Gemmini
 
-- **Offload-threshold pipeline**
-  - On a BOOM+Gemmini SoC, I built a **CPU vs Gemmini threshold benchmark**:
-    - Sweep tile shapes **(M, N)** and depths **K ∈ {1,…,8}**.
-    - Compare blocked CPU GEMM vs Gemmini (OS) cycles.
-    - Define **K\*(M, N)** = smallest K where Gemmini beats the CPU.
+On `GemminiRocketConfig` (Rocket core + Gemmini):
 
-- **Empirical behavior**
-  - Tiny tiles like **(4,4)** and **(8,4)** never beat the CPU for **K ≤ 8**  
-    → launch & data-movement overhead dominate.
-  - Larger, near-square tiles like **(10,10)** and **(12,12)** already win at **K\* = 1**.
-  - Shape matters:
-    - (8,12) has **K\* = 1**, while (12,8) has **K\* = 5**  
-      → **loop/blocking order and memory layout** strongly affect offload decisions.
+- **Benchmark.** `ws_os_single-baremetal`.
+- **Workload.** GEMM with `M = N = K ∈ {8,16,32,64,128,256,512,1024,2048}`.
+- **Metrics.** Total cycles and `MAC/100cyc` for both WS and OS.
 
-- **Speedups when offloaded**
-  - When offloading is beneficial (Offload = 1):
-    - Median speedup ≈ **1.7×**, mean ≈ **1.9×**, best cases ≈ **4×**.
+Key observations:
+
+- The **cycles vs size** curves are near-cubic, but `MAC/100cyc` reveals structure:
+  - **Small matrices (≤32).**
+    - Dominated by **launch + data-movement overhead**.
+  - **Large matrices (≥256).**
+    - `MAC/100cyc` plateaus → **bandwidth / tiling limits** dominate.
+- WS is consistently more efficient than OS; WS and OS give two views of the same
+  memory path.
+- Additional WS/OS heatmaps at `K = 256` visualize how **tile shape (M,N)** changes
+  throughput, with near-square tiles clearly better than very skinny ones.
+
+This baseline sets the template for later “before vs after” comparisons.
 
 ---
 
-## Takeaways
+## Part 2 – Memory-pipeline optimization on BOOM + Gemmini
 
-- GEMM confirms the same pattern I saw in SHA-3:
-  - **Compute is cheap; data movement and overheads decide real speedup.**
-- Offloading is **not “always good”**:
-  - There is a real, measurable **offload threshold K\*(M, N)** that shifts with the memory path.
-- This project turns that intuition into **measurement infrastructure**:
-  - For any new Gemmini/SoC config, re-running the pipeline shows how memory-centric changes move K\* and reshape the performance envelope.
+On a BOOM+Gemmini SoC, I compared:
+
+- **Before.** `GemminiLargeBoomV4Config`.
+- **After.**  `GemminiLargeBoomV43Config`.
+
+The MAC array is identical; only the **memory pipeline** changes via config mixins:
+
+- Scratchpad / accumulator (**SPM/ACC**) banking and sizing.
+- System bus **beat width**.
+- Gemmini **DMA bus-width alignment**.
+
+**Benchmark.**
+
+- `ws_os_single2-baremetal`, one-shot GEMM with
+  `M = N = K ∈ {8,16,32,64,128,256,512,1024}`, WS and OS.
+- Metrics: `MAC/100cyc` and total cycles.
+
+**Key result.**
+
+- For WS at \(1024^3\):
+  - Before: `MAC/100cyc ≈ 16k`.
+  - After:  `MAC/100cyc ≈ 25k`.
+  - → **≈58% throughput gain** and ≈37% latency reduction.
+- OS also improves (≈23% throughput gain at \(1024^3\)).
+- Across sizes, the “after” curves form a **higher plateau**, proving that the
+  previous limit was in the memory path, not in Gemmini’s compute.
+
+This is the matrix-compute analog of the SHA-3 L2-banking effect: **same compute,
+different memory**, very different perceived accelerator.
+
+---
+
+## Part 3 – CPU vs Gemmini offload threshold \(K^*\)
+
+To quantify **when offloading is actually worthwhile**, I built a small-tile threshold
+pipeline on a BOOM+Gemmini SoC:
+
+- **SoC.** `GemminiLargeBoomV4Config`.
+- **Benchmark.** `ws_os_threshold-baremetal`.
+- **Workload.**
+  - Tile sizes `(M,N) ∈ {4,6,8,10,12} × {4,6,8,10,12}`.
+  - For each `(M,N)`, sweep `K ∈ {1,…,8}`.
+- **Comparison.**
+  - CPU blocked GEMM vs Gemmini OS dataflow.
+- **Metric.**
+  - `K^*(M,N)` = smallest K where **ACC cycles < CPU cycles**.
+  - When offloaded, median speedup ≈1.7×, mean ≈1.9×, best ≈4×.
+
+Empirical patterns:
+
+- Tiny tiles like `(4,4)` and `(8,4)` **never benefit** from Gemmini up to `K=8`:
+  launch & data-movement overhead dominate.
+- Near-square larger tiles such as `(10,10)` and `(12,12)` have `K^* = 1`:
+  the accelerator’s setup cost is amortized immediately.
+- Shape matters:
+  - `(8,12)` has `K^* = 1` while `(12,8)` has `K^* = 5`,
+  - showing that **loop/blocking order and layout** strongly affect offload decisions.
+
+The takeaway is that **offloading is not “always good”**; it is a measurable policy
+problem governed by the memory path and tile geometry.
+
+---
+
+## What I learned
+
+- Gemmini’s raw MAC throughput is only meaningful when paired with a **co-designed
+  memory pipeline** and **offload policy**.
+- WS/OS sweeps, heatmaps, and `K^*(M,N)` give a compact, reusable way to characterize
+  an accelerator’s memory behavior.
+- Many “underperforming” accelerators are really **memory-path design** and
+  **offload-policy** problems, not compute limits.
+
+This project sets up the heterogeneous SoC work, where I push beyond single-workload
+evaluation and ask how these accelerators behave when they **compete** for DRAM and L2.
+
+---
+
+## Code & data map
+
+Key locations in the `chipyard_gemmini` branch:
+
+- **SoC configs.**
+  - `generators/chipyard/src/main/scala/config/GemminiBoomV4Configs.scala`  
+    BOOM + Gemmini configs for before/after memory-pipeline experiments.
+- **Gemmini mixins (memory pipeline).**
+  - Scratchpad/accumulator tuning, system-bus width, Gemmini DMA bus-width alignment
+    (file names vary with submodule version; all are documented in the README).
+- **Benchmarks.**
+  - `generators/gemmini/software/gemmini-rocc-tests/`:
+    - `ws_os_single-baremetal` – RocketConfig WS/OS sweep.
+    - `ws_os_single2-baremetal` – BOOM+Gemmini before/after GEMM.
+    - `ws_os_threshold-baremetal` – CPU vs Gemmini offload thresholds.
+- **Results & plots.**
+  - `sims/verilator/**/` – UART logs, CSV summaries.
+  - `figs/gemminirocket_mac100_vs_M.png`,
+    `figs/boomgemmini_mac100_before_after.png`,
+    and WS/OS heatmaps for `K=256`.
