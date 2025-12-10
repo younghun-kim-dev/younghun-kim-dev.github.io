@@ -41,12 +41,12 @@ to **co-design scratchpads, buses, and DMA** to fix them.
 
 ## Research questions
 
-1. On a simple Rocket+Gemmini SoC, how do **WS/OS GEMM** behaviors split into
+1. On a simple Rocket + Gemmini SoC, how do **WS/OS GEMM** behaviors split into
    overhead-dominated vs bandwidth-dominated regimes?
-2. On a BOOM+Gemmini SoC, how much of the “missing” performance is really in the
+2. On a BOOM + Gemmini SoC, how much of the “missing” performance is really in the
    **memory pipeline**, not the MAC array?
 3. For small/medium GEMM tiles, what is the **offload threshold \(K^*(M,N)\)** where
-   Gemmini first beats the CPU, and how does memory-path design shift \(K^*\)?
+   Gemmini first beats the CPU, and how does memory-path design shift \(K^*\)?  
 
 ---
 
@@ -76,10 +76,10 @@ This baseline sets the template for later “before vs after” comparisons.
 
 ## Part 2 – Memory-pipeline optimization on BOOM + Gemmini
 
-On a BOOM+Gemmini SoC, I compared:
+On a BOOM + Gemmini SoC, I compared:
 
 - **Before.** `GemminiLargeBoomV4Config`.
-- **After.**  `GemminiLargeBoomV43Config`.
+- **After.** `GemminiLargeBoomV43Config`.
 
 The MAC array is identical; only the **memory pipeline** changes via config mixins:
 
@@ -97,7 +97,7 @@ The MAC array is identical; only the **memory pipeline** changes via config mixi
 
 - For WS at \(1024^3\):
   - Before: `MAC/100cyc ≈ 16k`.
-  - After:  `MAC/100cyc ≈ 25k`.
+  - After: `MAC/100cyc ≈ 25k`.
   - → **≈58% throughput gain** and ≈37% latency reduction.
 - OS also improves (≈23% throughput gain at \(1024^3\)).
 - Across sizes, the “after” curves form a **higher plateau**, proving that the
@@ -111,7 +111,7 @@ different memory**, very different perceived accelerator.
 ## Part 3 – CPU vs Gemmini offload threshold \(K^*\)
 
 To quantify **when offloading is actually worthwhile**, I built a small-tile threshold
-pipeline on a BOOM+Gemmini SoC:
+pipeline on a BOOM + Gemmini SoC:
 
 - **SoC.** `GemminiLargeBoomV4Config`.
 - **Benchmark.** `ws_os_threshold-baremetal`.
@@ -166,7 +166,7 @@ Key locations in the `chipyard_gemmini` branch:
 - **Benchmarks.**
   - `generators/gemmini/software/gemmini-rocc-tests/`:
     - `ws_os_single-baremetal` – RocketConfig WS/OS sweep.
-    - `ws_os_single2-baremetal` – BOOM+Gemmini before/after GEMM.
+    - `ws_os_single2-baremetal` – BOOM + Gemmini before/after GEMM.
     - `ws_os_threshold-baremetal` – CPU vs Gemmini offload thresholds.
 - **Results & plots.**
   - `sims/verilator/**/` – UART logs, CSV summaries.
